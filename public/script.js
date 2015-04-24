@@ -1,5 +1,7 @@
 var body = document.getElementsByTagName("body")[0];
 
+var ul = document.getElementsByTagName("ul")[0];
+
 var usRadioButton = document.getElementById("us");
 
 var gbRadioButton = document.getElementById("gb");
@@ -12,10 +14,15 @@ var choiceButton = document.getElementById("choice");
 
 
 var createDate = function(newDate){
-
-}
-
-
+    var x = JSON.parse(newDate).results[0].user;
+    document.getElementsByTagName('img')[0].src = x.picture.large;
+    var array = [x.name.first, x.location.street, x.password, x.phone]
+    array.forEach(function(item){
+      var li = document.createElement("li");
+      li.innerText = item;
+      ul.appendChild(li);
+    });
+  };
 
 
 var ajaxGet = function(){
@@ -42,17 +49,45 @@ var ajaxGet = function(){
   var xhr = new XMLHttpRequest();
   xhr.open("GET", query);
   xhr.addEventListener("load", function(){
-    var x = JSON.parse(xhr.response);
-    var user_name = x.results[0].user.name.first;
-    var address = x.results[0].user.location.street;
-    var password = x.results[0].user.password;
-    var phone_number = x.results[0].user.phone;
-    var pic = x.results[0].user.picture.large;
+    createDate(xhr.response);
   });
-  var newDate = {user_name: user_name, address: address, password: password, phone_number: phone_number, pic: pic};
   // None of the above runs until xhr.send runs
-  xhr.send(newDate);
+  xhr.send();
+}
+
+var ajaxSave = function() {
+  var url = "http://localhost:3000/date"
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  // xhr.addEventListener("load", function(){
+  //   crea(xhr.response);
+  // });
+  var list = document.getElementsByTagName("li");
+  var image = document.getElementsByTagName("img")[0].src;
+  console.log(list);
+  var newDate = {user_name: list[0].innerText, address: list[1].innerText, password: list[2].innerText, phone_number: list[2].innerText, pic: image};
+  xhr.send(JSON.stringify(newDate));
 }
 
 
 choiceButton.addEventListener("click", ajaxGet);
+
+
+dump.addEventListener("click", function(){
+  var list = document.getElementsByTagName("li");
+  var lLength = list.length;
+  for(var i = 0;i<lLength; i++){
+    list[0].remove();
+  }
+  var img = document.getElementsByTagName("img")[0];
+    img.remove();
+});
+
+date.addEventListener("click", ajaxSave);
+
+
+
+
+
+
