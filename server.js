@@ -5,6 +5,10 @@ app.use(express.static("public"));
 var bodyParser = require("body-parser");
 app.use(bodyParser.json({extended: false}));
 var request = require("request");
+
+var sqlite3 = require("sqlite3");
+
+var db = new sqlite3.Database('wdinder.db');
 // var instApi = process.env["INSTAPI"];
 // console.log(instApi);
 
@@ -13,8 +17,12 @@ app.get("/", function(req, res){
 });
 
 app.post("/date", function(req, res){
-  db.run("INSERT INTO dates (user_name, address, password, phone_number, pic) VALUES(?, ?, ?, ?, ?)", req.body.title, req.body.brief, req.body.image, function(err) {
-    res.redirect("/categories")
+  var newDate = req.body;
+  //console.log(newDate);
+  db.run("INSERT INTO dates (user_name, address, password, phone_number, pic) VALUES(?, ?, ?, ?, ?)", newDate.user_name, newDate.address, newDate.password, newDate.phone_number, newDate.pic, function(err) {
+  db.all("SELECT * FROM dates;", function(err, data){
+    res.json(data);
+  });
   });
 })
 
